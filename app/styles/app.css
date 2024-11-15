@@ -28,6 +28,17 @@ img {
   border-radius: 5%;
 }
 
+.button-cart{
+  color : #ffffff;
+  border: 1px solid black;
+  background-color: black;
+  /*font-weight: bold;*/
+  font-size: 15px;
+  padding: 10px 100px 10px 100px;
+  border-radius: 5px;
+}
+
+
 
 /*
 * --------------------------------------------------

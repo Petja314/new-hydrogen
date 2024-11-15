@@ -138,15 +138,15 @@ export default function Product() {
   // console.log('product >', product);
   // console.log('selectedVariant >', selectedVariant);
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
+    <div className="product container max-w-[1200px] flex border border-black ">
+      <ProductImage image={selectedVariant?.image} width={'100px'} />
       <div className="product-main">
-        <h1>{title}</h1>
+        <h2 className={'text-black text-3xl'}>{title}</h2>
         <ProductPrice
           price={selectedVariant?.price}
           compareAtPrice={selectedVariant?.compareAtPrice}
         />
-        <br />
+
         <Suspense
           fallback={
             <ProductForm
@@ -169,14 +169,11 @@ export default function Product() {
             )}
           </Await>
         </Suspense>
-        <br />
-        <br />
+
         <p>
           <strong>Description</strong>
         </p>
-        <br />
         <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
       </div>
       <Analytics.ProductView
         data={{

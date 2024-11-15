@@ -19,9 +19,9 @@ export function ProductForm({
   const {open} = useAside();
   // console.log('variants >', variants);
   // console.log('selectedVariant >', selectedVariant);
-  console.log('product >', product);
+  // console.log('product >', product);
   return (
-    <div className="product-form">
+    <div className="product-form font-medium border border-red-500 mt-4 mb-10 ">
       <VariantSelector
         handle={product.handle}
         options={product.options.filter(
@@ -31,7 +31,7 @@ export function ProductForm({
       >
         {({option}) => <ProductOptions key={option.name} option={option} />}
       </VariantSelector>
-      <br />
+
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         onClick={() => {
@@ -55,10 +55,21 @@ export function ProductForm({
   );
 }
 
+const colorVariants = [
+  {bgcolor: 'bg-yellow-500', value: 'Multi'},
+  {bgcolor: 'bg-blue-500', value: 'Blue'},
+  {bgcolor: 'bg-red-400', value: 'Pink'},
+  {bgcolor: 'bg-black', value: 'Black'},
+  {bgcolor: 'bg-red-600', value: 'Red'},
+];
+
 function ProductOptions({option}: {option: VariantOption}) {
+  // console.log('option.values', option.values);
+
   return (
-    <div className="product-options" key={option.name}>
-      <h5>{option.name}</h5>
+    <div className="product-options " key={option.name}>
+      <h5 className={'mb-4'}>{option.name}</h5>
+
       <div className="product-options-grid">
         {option.values.map(({value, isAvailable, isActive, to}) => {
           return (
@@ -74,7 +85,23 @@ function ProductOptions({option}: {option: VariantOption}) {
                 opacity: isAvailable ? 1 : 0.3,
               }}
             >
-              {value}
+              {option.name === 'Size' ? (
+                <h5 className={''}>{value}</h5>
+              ) : option.name === 'Color' ? (
+                <div>
+                  <h5 className={''}>{value}</h5>
+                  <span className="opacity-50">
+                    {
+                      colorVariants.find((color) => color.value === value)
+                        ?.value
+                    }
+                  </span>
+                </div>
+              ) : (
+                <h5>{value}</h5>
+              )}
+
+              {/*{value}*/}
             </Link>
           );
         })}
