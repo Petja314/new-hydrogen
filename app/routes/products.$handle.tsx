@@ -134,7 +134,7 @@ export default function Product() {
   );
 
   const {title, descriptionHtml} = product;
-
+  console.log('');
   // console.log('product >', product);
   // console.log('selectedVariant >', selectedVariant);
   return (
