@@ -17,11 +17,16 @@ export function ProductForm({
   variants: Array<ProductVariantFragment>;
 }) {
   const {open} = useAside();
+  // console.log('variants >', variants);
+  // console.log('selectedVariant >', selectedVariant);
+  console.log('product >', product);
   return (
     <div className="product-form">
       <VariantSelector
         handle={product.handle}
-        options={product.options.filter((option) => option.optionValues.length > 1)}
+        options={product.options.filter(
+          (option) => option.optionValues.length >= 1,
+        )}
         variants={variants}
       >
         {({option}) => <ProductOptions key={option.name} option={option} />}

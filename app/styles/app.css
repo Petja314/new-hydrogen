@@ -3,14 +3,31 @@
   --cart-aside-summary-height-with-discount: 300px;
   --cart-aside-summary-height: 250px;
   --grid-item-width: 355px;
-  --header-height: 64px;
+  --header-height: 90px;
   --color-dark: #000;
   --color-light: #fff;
+  --color-base-text: 0, 0, 0;
+  --color-foreground: var(--color-base-text);
+  --font-body-family: 'Inter', sans-serif;
+
 }
 
 img {
   border-radius: 4px;
 }
+
+/*
+* --------------------------------------------------
+* Buttons/Style
+* --------------------------------------------------
+*/
+
+.button-wh{
+  border : 2px solid #ffffff;
+  padding: 10px 25px 10px 25px;
+  border-radius: 5%;
+}
+
 
 /*
 * --------------------------------------------------
@@ -138,24 +155,39 @@ button.reset:not(:has(> *)) {
 }
 
 button.reset:hover:not(:has(> *)) {
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
 }
+
+
 
 /*
 * --------------------------------------------------
 * components/Header
 * --------------------------------------------------
 */
+
+
 .header {
+  display: grid;
   align-items: center;
   background: #fff;
-  display: flex;
   height: var(--header-height);
-  padding: 0 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  /*position: sticky;*/
+  /*top: 0;*/
+  /*z-index: 1;*/
+}
+.header-width {
+  margin: 0 auto;
+  max-width: 120rem;
+}
+
+.header-middle-center{
+  grid-template-areas: "navigation heading icons";
+  grid-template-columns: 2fr auto 2fr;
+  column-gap: 19rem;
 }
 
 .header-menu-mobile-toggle {
@@ -182,13 +214,13 @@ button.reset:hover:not(:has(> *)) {
 
 .header-menu-item {
   cursor: pointer;
+  text-underline: none;
 }
 
 .header-ctas {
   align-items: center;
   display: flex;
   grid-gap: 1rem;
-  margin-left: auto;
 }
 
 /*
@@ -343,17 +375,22 @@ button.reset:hover:not(:has(> *)) {
   object-fit: cover;
 }
 
+
 .recommended-products-grid {
   display: grid;
   grid-gap: 1.5rem;
-  grid-template-columns: repeat(2, 1fr);
-  @media (min-width: 45em) {
-    grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* 3 items per row by default */
+  justify-items: center; /* Center the items horizontally */
+}
+
+@media (max-width: 45em) {
+  .recommended-products-grid {
+    grid-template-columns: 1fr; /* 1 item per row (column layout) on smaller screens */
   }
 }
 
-.recommended-product img {
-  height: auto;
+.recommended-pr-bg-cl{
+  background-color: rgb(243, 243, 243);
 }
 
 /*

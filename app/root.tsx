@@ -14,6 +14,8 @@ import {
 import favicon from '~/assets/favicon.svg';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import tailwindStyles from '~/styles/tailwind.css?url';
+import customFonts from '~/styles/fonts.css?url';
 import {PageLayout} from '~/components/PageLayout';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 
@@ -41,6 +43,12 @@ export function links() {
   return [
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
+    {rel: 'stylesheet', href: tailwindStyles},
+    {rel: 'stylesheet', href: customFonts},
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&display=swap',
+    },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -141,7 +149,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body style={{margin: 0, padding: 0}}>
         {data ? (
           <Analytics.Provider
             cart={data.cart}

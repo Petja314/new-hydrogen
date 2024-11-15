@@ -6,6 +6,8 @@ import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
+import Banner from '~/components/Banner';
+import TextComponent from '~/components/TextComponent';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -42,7 +44,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  debugger
+  debugger;
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error) => {
@@ -58,12 +60,13 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
-  console.log('data >' , data)
+  console.log('data >', data);
   return (
     <div className="home">
-      TEST STORE
-      <FeaturedCollection collection={data.featuredCollection} />
+      <Banner />
+      {/*<FeaturedCollection collection={data.featuredCollection} />*/}
       <RecommendedProducts products={data.recommendedProducts} />
+      <TextComponent />
     </div>
   );
 }
@@ -96,12 +99,16 @@ function RecommendedProducts({
   products: Promise<RecommendedProductsQuery | null>;
 }) {
   return (
-    <div className="recommended-products">
-      <h2>Recommended Products</h2>
+    <div className="recommended-products container  mt-12 mb-12">
+      <div className={'flex flex-col items-center'}>
+        <span className={'font-medium'}>New arrivals</span>
+        <h2 className={'mt-3 text-3xl text-black'}>Recommended Products</h2>
+      </div>
+
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
           {(response) => (
-            <div className="recommended-products-grid">
+            <div className="recommended-products-grid ">
               {response
                 ? response.products.nodes.map((product) => (
                     <Link
@@ -111,11 +118,17 @@ function RecommendedProducts({
                     >
                       <Image
                         data={product.images.nodes[0]}
-                        aspectRatio="1/1"
-                        sizes="(min-width: 45em) 20vw, 50vw"
+                        // aspectRatio="1/1"
+                        // sizes="(min-width: 45em) 20vw, 50vw"
+                        width={'250px'}
+                        className={
+                          'hover:scale-90 transition-all duration-500 '
+                        }
                       />
-                      <h4>{product.title}</h4>
-                      <small>
+                      <h4 className={'max-w-[250px] font-medium text-sm'}>
+                        {product.title}
+                      </h4>
+                      <small className={'font-bold'}>
                         <Money data={product.priceRange.minVariantPrice} />
                       </small>
                     </Link>
@@ -176,7 +189,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }

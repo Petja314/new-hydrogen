@@ -7,6 +7,8 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import logo from '../assets/logo/logo.webp';
+import {LogIn, Search, ShoppingBag, ShoppingCart, User} from 'lucide-react';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -25,16 +27,19 @@ export function Header({
 }: HeaderProps) {
   const {shop, menu} = header;
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
+    <header className="header header-middle-center header-width mb-10   ">
       <HeaderMenu
         menu={menu}
         viewport="desktop"
         primaryDomainUrl={header.shop.primaryDomain.url}
         publicStoreDomain={publicStoreDomain}
       />
+
+      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
+        {/*<h2>{shop.name}</h2>*/}
+        <img src={logo} alt="logo" className={'max-w-32 '} />
+      </NavLink>
+
       <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
     </header>
   );
@@ -79,7 +84,7 @@ export function HeaderMenu({
             : item.url;
         return (
           <NavLink
-            className="header-menu-item"
+            className="header-menu-item no-underline hover:no-underline"
             end
             key={item.id}
             onClick={close}
@@ -105,7 +110,8 @@ function HeaderCtas({
       <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
         <Suspense fallback="Sign in">
           <Await resolve={isLoggedIn} errorElement="Sign in">
-            {(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}
+            {/*{(isLoggedIn) => (isLoggedIn ? 'Account' : 'Sign in')}*/}
+            {(isLoggedIn) => (isLoggedIn ? <User /> : <LogIn />)}
           </Await>
         </Suspense>
       </NavLink>
@@ -131,7 +137,8 @@ function SearchToggle() {
   const {open} = useAside();
   return (
     <button className="reset" onClick={() => open('search')}>
-      Search
+      <Search />
+      {/*Search*/}
     </button>
   );
 }
@@ -154,7 +161,14 @@ function CartBadge({count}: {count: number | null}) {
         } as CartViewPayload);
       }}
     >
-      Cart {count === null ? <span>&nbsp;</span> : count}
+      <div className="relative">
+        <ShoppingBag />
+        {count !== null && (
+          <span className="absolute top-[15px] right-[-10px] flex items-center justify-center h-5 w-5 text-xs font-bold text-white bg-black rounded-full">
+            {count}
+          </span>
+        )}
+      </div>
     </a>
   );
 }
