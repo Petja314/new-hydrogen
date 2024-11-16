@@ -27,7 +27,7 @@ export function Header({
 }: HeaderProps) {
   const {shop, menu} = header;
   return (
-    <header className="header header-middle-center header-width mb-10   ">
+    <header className="header header-middle-center header-width mb-10  ">
       <HeaderMenu
         menu={menu}
         viewport="desktop"

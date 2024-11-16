@@ -1,10 +1,23 @@
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
+import {
+  useLoaderData,
+  Link,
+  type MetaFunction,
+  useNavigate,
+} from '@remix-run/react';
+import {
+  getPaginationVariables,
+  Image,
+  Money,
+  Pagination,
+} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {InfiniteScroll} from '~/components/InfiniteScroll';
+import {useEffect} from 'react';
+import {useInView} from 'react-intersection-observer';
+import {ProductsLoadedOnScroll} from '~/components/ProductsLoadedOnScroll';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Hydrogen | Products`}];
@@ -50,6 +63,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
+  const {ref, inView, entry} = useInView();
 
   console.log('products >', products);
   return (
@@ -57,13 +71,26 @@ export default function Collection() {
       <div className="collection container max-w-[1200px] ">
         <h2 className={'text-4xl text-black  mb-10'}>Products</h2>
 
-        {/*<InfiniteScroll*/}
-        {/*  query={CATALOG_QUERY}*/}
-        {/*  variables={{*/}
-        {/*    first: 8, // Начальное количество элементов*/}
-        {/*    after: null, // Начальный курсор*/}
-        {/*  }}*/}
-        {/*  extractNodes={(data) => data.products.nodes} // Как извлечь элементы из ответа*/}
+        <Pagination connection={products}>
+          {({nodes, NextLink, hasNextPage, nextPageUrl, state}) => (
+            <>
+              <ProductsLoadedOnScroll
+                nodes={nodes}
+                inView={inView}
+                hasNextPage={hasNextPage}
+                nextPageUrl={nextPageUrl}
+                state={state}
+                Component={ProductItem}
+                className={'grid grid-cols-3 gap-4'}
+              />
+              <NextLink ref={ref}>Load more</NextLink>
+            </>
+          )}
+        </Pagination>
+
+        {/*<PaginatedResourceSection*/}
+        {/*  connection={products}*/}
+        {/*  resourcesClassName="products-grid"*/}
         {/*>*/}
         {/*  {({node: product, index}) => (*/}
         {/*    <ProductItem*/}
@@ -72,20 +99,7 @@ export default function Collection() {
         {/*      loading={index < 8 ? 'eager' : undefined}*/}
         {/*    />*/}
         {/*  )}*/}
-        {/*</InfiniteScroll>*/}
-
-        <PaginatedResourceSection
-          connection={products}
-          resourcesClassName="products-grid"
-        >
-          {({node: product, index}) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 8 ? 'eager' : undefined}
-            />
-          )}
-        </PaginatedResourceSection>
+        {/*</PaginatedResourceSection>*/}
       </div>
     </div>
   );
@@ -94,32 +108,32 @@ export default function Collection() {
 function ProductItem({
   product,
   loading,
+  key,
 }: {
   product: ProductItemFragment | any;
   loading?: 'eager' | 'lazy';
+  key?: any;
 }) {
   const variant = product.variants.nodes[0];
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
   return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {product.featuredImage && (
-        <Image
-          alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
-          data={product.featuredImage}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
+    <Link className="product-item " key={key} prefetch="intent" to={variantUrl}>
+      <div className={'max-w-[300px] '}>
+        {product.featuredImage && (
+          <Image
+            alt={product.featuredImage.altText || product.title}
+            // aspectRatio="1/1"
+            data={product.featuredImage}
+            loading={loading}
+            sizes="(min-width: 45em) 400px, 100vw"
+            style={{width: '300px'}}
+          />
+        )}
+        <h3 className={'mt-3 mb-2 font-medium'}>{product.title}</h3>
+        <small className={'font-medium'}>
+          <Money data={product.priceRange.minVariantPrice} />
+        </small>
+      </div>
     </Link>
   );
 }
