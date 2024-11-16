@@ -134,11 +134,10 @@ export default function Product() {
   );
 
   const {title, descriptionHtml} = product;
-  console.log('');
   // console.log('product >', product);
   // console.log('selectedVariant >', selectedVariant);
   return (
-    <div className="product container max-w-[1200px] flex border border-black ">
+    <div className="product container max-w-[1200px] flex ">
       <ProductImage image={selectedVariant?.image} width={'100px'} />
       <div className="product-main">
         <h2 className={'text-black text-3xl'}>{title}</h2>

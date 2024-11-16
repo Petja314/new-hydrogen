@@ -4,6 +4,7 @@ import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {InfiniteScroll} from '~/components/InfiniteScroll';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Hydrogen | Products`}];
@@ -50,21 +51,42 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
 
+  console.log('products >', products);
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
+    <div className={'recommended-pr-bg-cl pt-10 pb-10 '}>
+      <div className="collection container max-w-[1200px] ">
+        <h2 className={'text-4xl text-black  mb-10'}>Products</h2>
+
+        {/*<InfiniteScroll*/}
+        {/*  query={CATALOG_QUERY}*/}
+        {/*  variables={{*/}
+        {/*    first: 8, // Начальное количество элементов*/}
+        {/*    after: null, // Начальный курсор*/}
+        {/*  }}*/}
+        {/*  extractNodes={(data) => data.products.nodes} // Как извлечь элементы из ответа*/}
+        {/*>*/}
+        {/*  {({node: product, index}) => (*/}
+        {/*    <ProductItem*/}
+        {/*      key={product.id}*/}
+        {/*      product={product}*/}
+        {/*      loading={index < 8 ? 'eager' : undefined}*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</InfiniteScroll>*/}
+
+        <PaginatedResourceSection
+          connection={products}
+          resourcesClassName="products-grid"
+        >
+          {({node: product, index}) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 8 ? 'eager' : undefined}
+            />
+          )}
+        </PaginatedResourceSection>
+      </div>
     </div>
   );
 }
@@ -73,7 +95,7 @@ function ProductItem({
   product,
   loading,
 }: {
-  product: ProductItemFragment;
+  product: ProductItemFragment | any;
   loading?: 'eager' | 'lazy';
 }) {
   const variant = product.variants.nodes[0];

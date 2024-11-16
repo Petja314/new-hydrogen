@@ -106,7 +106,7 @@ function RecommendedProducts({
       </div>
 
       <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={products}>
+        <Await resolve={products} errorElement={<CollectionError />}>
           {(response) => (
             <div className="recommended-products-grid ">
               {response
@@ -142,6 +142,10 @@ function RecommendedProducts({
     </div>
   );
 }
+
+const CollectionError = () => {
+  return <div>Error Suspense</div>;
+};
 
 const FEATURED_COLLECTION_QUERY = `#graphql
   fragment FeaturedCollection on Collection {

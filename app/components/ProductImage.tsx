@@ -12,9 +12,8 @@ export function ProductImage({
     return <div className="product-image" />;
   }
   return (
-    <div className="product-image   border border-gray-500  flex items-center">
+    <div className="product-image   flex items-center">
       <Image
-        style={{border: '1px solid red'}}
         alt={image.altText || 'Product Image'}
         aspectRatio="1/1"
         data={image}

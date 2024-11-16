@@ -93,17 +93,16 @@ const ColorVariant = () => {
         <div className="flex gap-3">
           {product.colorVariants.map((item: any, i) => (
             <Fragment key={i}>
-              <input
-                type="radio"
-                className="absolute hidden"
-                autoComplete="off"
-                checked={selectedColor === item.value}
-                onChange={() => handleColorChange(item.value)}
-              />
+              {/*<input*/}
+              {/*  type="radio"*/}
+              {/*  className="absolute hidden"*/}
+              {/*  autoComplete="off"*/}
+              {/*  checked={selectedColor === item.value}*/}
+              {/*  onChange={() => handleColorChange(item.value)}*/}
+              {/*/>*/}
               <label
-                className={`w-8 h-8 rounded-full ${
-                  item.bgcolor
-                } border-2 border-white dark:border-[#0b1727] cursor-pointer mt-1 hover:outline hover:outline-1 hover:outline-${
+                className={`w-8 h-8 rounded-full ${item.bgcolor} 
+                border-2 border-white dark:border-[#0b1727] cursor-pointer mt-1 hover:outline hover:outline-1 hover:outline-${
                   item.color
                 } ${
                   selectedColor === item.value &&
