@@ -5,10 +5,14 @@ import {
   Image,
   Money,
   Analytics,
+  Pagination,
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import * as React from 'react';
+import {ProductsLoadedOnScroll} from '~/components/ProductsLoadedOnScroll';
+import {useInView} from 'react-intersection-observer';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
@@ -72,63 +76,104 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
+  const {ref, inView, entry} = useInView();
 
   return (
-    <div className="collection">
-      <h1>{collection.title}</h1>
-      <p className="collection-description">{collection.description}</p>
-      <PaginatedResourceSection
-        connection={collection.products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
-      <Analytics.CollectionView
-        data={{
-          collection: {
-            id: collection.id,
-            handle: collection.handle,
-          },
-        }}
-      />
+    <div className={'recommended-pr-bg-cl pt-10 pb-10 '}>
+      <div className="collection container max-w-[1200px]">
+        <h2 className={'text-4xl text-black  mb-10'}>{collection.title}</h2>
+        {/*<p className="collection-description">{collection.description}</p>*/}
+        <Pagination connection={collection.products}>
+          {({
+            nodes,
+            NextLink,
+            PreviousLink,
+            isLoading,
+            hasNextPage,
+            nextPageUrl,
+            state,
+          }) => (
+            <>
+              <PreviousLink
+                className={
+                  'inline-block rounded font-medium text-center py-3 px-6 border border-gray-300 bg-contrast text-primary w-full mb-5'
+                }
+              >
+                {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+              </PreviousLink>
+              <ProductsLoadedOnScroll
+                nodes={nodes}
+                inView={inView}
+                hasNextPage={hasNextPage}
+                nextPageUrl={nextPageUrl}
+                state={state}
+                Component={ProductItem}
+                className={'grid grid-cols-3 gap-4 place-items-center '}
+              />
+              <NextLink
+                ref={ref}
+                className={
+                  'inline-block rounded font-medium text-center py-3 px-6 border border-gray-300 bg-contrast text-primary w-full mb-5'
+                }
+              >
+                Load more
+              </NextLink>
+            </>
+          )}
+        </Pagination>
+        {/*<PaginatedResourceSection*/}
+        {/*  connection={collection.products}*/}
+        {/*  resourcesClassName="products-grid"*/}
+        {/*>*/}
+        {/*  {({node: product, index}) => (*/}
+        {/*    <ProductItem*/}
+        {/*      key={product.id}*/}
+        {/*      product={product}*/}
+        {/*      loading={index < 8 ? 'eager' : undefined}*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</PaginatedResourceSection>*/}
+        <Analytics.CollectionView
+          data={{
+            collection: {
+              id: collection.id,
+              handle: collection.handle,
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }
 
 function ProductItem({
-  product,
+  item,
   loading,
 }: {
   product: ProductItemFragment;
   loading?: 'eager' | 'lazy';
 }) {
-  const variant = product.variants.nodes[0];
-  const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
+  const variant = item.variants.nodes[0];
+  const variantUrl = useVariantUrl(item.handle, variant.selectedOptions);
   return (
     <Link
       className="product-item"
-      key={product.id}
+      key={item.id}
       prefetch="intent"
       to={variantUrl}
     >
-      {product.featuredImage && (
+      {item.featuredImage && (
         <Image
-          alt={product.featuredImage.altText || product.title}
+          alt={item.featuredImage.altText || item.title}
           aspectRatio="1/1"
-          data={product.featuredImage}
+          data={item.featuredImage}
           loading={loading}
           sizes="(min-width: 45em) 400px, 100vw"
         />
       )}
-      <h4>{product.title}</h4>
+      <h4>{item.title}</h4>
       <small>
-        <Money data={product.priceRange.minVariantPrice} />
+        <Money data={item.priceRange.minVariantPrice} />
       </small>
     </Link>
   );

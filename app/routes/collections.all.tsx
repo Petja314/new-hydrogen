@@ -15,9 +15,11 @@ import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {InfiniteScroll} from '~/components/InfiniteScroll';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useInView} from 'react-intersection-observer';
 import {ProductsLoadedOnScroll} from '~/components/ProductsLoadedOnScroll';
+import {context} from 'esbuild';
+import * as React from 'react';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Hydrogen | Products`}];
@@ -64,16 +66,33 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
   const {ref, inView, entry} = useInView();
+  const [currentProducts, setCurrentProducts] = useState();
+  // console.log('products >', products);
+  // Функция для обработки запроса
 
-  console.log('products >', products);
   return (
     <div className={'recommended-pr-bg-cl pt-10 pb-10 '}>
-      <div className="collection container max-w-[1200px] ">
+      <div className="collection container max-w-[1200px]">
         <h2 className={'text-4xl text-black  mb-10'}>Products</h2>
 
         <Pagination connection={products}>
-          {({nodes, NextLink, hasNextPage, nextPageUrl, state}) => (
+          {({
+            nodes,
+            NextLink,
+            PreviousLink,
+            isLoading,
+            hasNextPage,
+            nextPageUrl,
+            state,
+          }) => (
             <>
+              <PreviousLink
+                className={
+                  'inline-block rounded font-medium text-center py-3 px-6 border border-gray-300 bg-contrast text-primary w-full mb-5'
+                }
+              >
+                {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+              </PreviousLink>
               <ProductsLoadedOnScroll
                 nodes={nodes}
                 inView={inView}
@@ -81,7 +100,7 @@ export default function Collection() {
                 nextPageUrl={nextPageUrl}
                 state={state}
                 Component={ProductItem}
-                className={'grid grid-cols-3 gap-4'}
+                className={'grid grid-cols-3 gap-4 place-items-center '}
               />
               <NextLink ref={ref}>Load more</NextLink>
             </>
@@ -106,32 +125,32 @@ export default function Collection() {
 }
 
 function ProductItem({
-  product,
+  item,
   loading,
   key,
 }: {
-  product: ProductItemFragment | any;
+  item: ProductItemFragment | any;
   loading?: 'eager' | 'lazy';
   key?: any;
 }) {
-  const variant = product.variants.nodes[0];
-  const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
+  const variant = item.variants.nodes[0];
+  const variantUrl = useVariantUrl(item.handle, variant.selectedOptions);
   return (
     <Link className="product-item " key={key} prefetch="intent" to={variantUrl}>
-      <div className={'max-w-[300px] '}>
-        {product.featuredImage && (
+      <div className={'max-w-[300px]'}>
+        {item.featuredImage && (
           <Image
-            alt={product.featuredImage.altText || product.title}
+            alt={item.featuredImage.altText || item.title}
             // aspectRatio="1/1"
-            data={product.featuredImage}
+            data={item.featuredImage}
             loading={loading}
             sizes="(min-width: 45em) 400px, 100vw"
             style={{width: '300px'}}
           />
         )}
-        <h3 className={'mt-3 mb-2 font-medium'}>{product.title}</h3>
+        <h3 className={'mt-3 mb-2 font-medium'}>{item.title}</h3>
         <small className={'font-medium'}>
-          <Money data={product.priceRange.minVariantPrice} />
+          <Money data={item.priceRange.minVariantPrice} />
         </small>
       </div>
     </Link>
@@ -139,61 +158,61 @@ function ProductItem({
 }
 
 const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment ProductItem on Product {
+fragment MoneyProductItem on MoneyV2 {
+  amount
+  currencyCode
+}
+fragment ProductItem on Product {
+  id
+  handle
+  title
+  featuredImage {
     id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
+    altText
+    url
+    width
+    height
+  }
+  priceRange {
+    minVariantPrice {
+      ...MoneyProductItem
     }
-    priceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-      maxVariantPrice {
-        ...MoneyProductItem
-      }
+    maxVariantPrice {
+      ...MoneyProductItem
     }
-    variants(first: 1) {
-      nodes {
-        selectedOptions {
-          name
-          value
-        }
+  }
+  variants(first: 1) {
+    nodes {
+      selectedOptions {
+        name
+        value
       }
     }
   }
+}
 ` as const;
 
 // NOTE: https://shopify.dev/docs/api/storefront/2024-01/objects/product
 const CATALOG_QUERY = `#graphql
-  query Catalog(
-    $country: CountryCode
-    $language: LanguageCode
-    $first: Int
-    $last: Int
-    $startCursor: String
-    $endCursor: String
-  ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
-      nodes {
-        ...ProductItem
-      }
-      pageInfo {
-        hasPreviousPage
-        hasNextPage
-        startCursor
-        endCursor
-      }
+query Catalog(
+  $country: CountryCode
+  $language: LanguageCode
+  $first: Int
+  $last: Int
+  $startCursor: String
+  $endCursor: String
+) @inContext(country: $country, language: $language) {
+  products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    nodes {
+      ...ProductItem
+    }
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
     }
   }
-  ${PRODUCT_ITEM_FRAGMENT}
+}
+${PRODUCT_ITEM_FRAGMENT}
 ` as const;

@@ -23,13 +23,14 @@ export function ProductsLoadedOnScroll({
     }
   }, [inView, navigate, state, nextPageUrl, hasNextPage, location.pathname]);
   // console.log('state >', state);
-  console.log('location >', location.pathname);
+  // console.log('location >', location.pathname);
   // console.log('nextPageUrl >', nextPageUrl);
+  console.log('nodes >', nodes);
   return (
     <div className={className as string}>
-      {nodes.map((product: any) => (
-        <div key={product.id}>
-          <Component product={product} />
+      {nodes.map((item: any) => (
+        <div key={item.id} className={''}>
+          <Component item={item} />
         </div>
       ))}
     </div>

@@ -1,7 +1,10 @@
 import {useLoaderData, Link} from '@remix-run/react';
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {getPaginationVariables, Image, Pagination} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
+import * as React from 'react';
+import {ProductsLoadedOnScroll} from '~/components/ProductsLoadedOnScroll';
+import {useInView} from 'react-intersection-observer';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -44,49 +47,88 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 
 export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
+  const {ref, inView, entry} = useInView();
 
   return (
-    <div className="collections">
-      <h1>Collections</h1>
-      <PaginatedResourceSection
-        connection={collections}
-        resourcesClassName="collections-grid"
-      >
-        {({node: collection, index}) => (
-          <CollectionItem
-            key={collection.id}
-            collection={collection}
-            index={index}
-          />
-        )}
-      </PaginatedResourceSection>
+    <div className={'recommended-pr-bg-cl pt-10 pb-10 '}>
+      <div className="collection container max-w-[1200px]">
+        <h2 className={'text-4xl text-black  mb-10'}>Collections</h2>
+
+        <Pagination connection={collections}>
+          {({
+            nodes,
+            NextLink,
+            PreviousLink,
+            isLoading,
+            hasNextPage,
+            nextPageUrl,
+            state,
+          }) => (
+            <>
+              <PreviousLink
+                className={
+                  'inline-block rounded font-medium text-center py-3 px-6 border border-gray-300 bg-contrast text-primary w-full mb-5'
+                }
+              >
+                {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+              </PreviousLink>
+              <ProductsLoadedOnScroll
+                nodes={nodes}
+                inView={inView}
+                hasNextPage={hasNextPage}
+                nextPageUrl={nextPageUrl}
+                state={state}
+                Component={CollectionItem}
+                className={'grid grid-cols-3 gap-4 place-items-center '}
+              />
+              <NextLink ref={ref}>Load more</NextLink>
+            </>
+          )}
+        </Pagination>
+
+        {/*<PaginatedResourceSection*/}
+        {/*  connection={collections}*/}
+        {/*  resourcesClassName="collections-grid"*/}
+        {/*>*/}
+        {/*  {({node: collection, index}) => (*/}
+        {/*    <CollectionItem*/}
+        {/*      key={collection.id}*/}
+        {/*      collection={collection}*/}
+        {/*      index={index}*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</PaginatedResourceSection>*/}
+      </div>
     </div>
   );
 }
 
 function CollectionItem({
-  collection,
+  item,
   index,
 }: {
-  collection: CollectionFragment;
+  item: CollectionFragment;
   index: number;
 }) {
   return (
     <Link
       className="collection-item"
-      key={collection.id}
-      to={`/collections/${collection.handle}`}
+      key={item.id}
+      to={`/collections/${item?.handle}`}
       prefetch="intent"
     >
-      {collection?.image && (
-        <Image
-          alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
-        />
-      )}
-      <h5>{collection.title}</h5>
+      <div className={'max-w-[300px]'}>
+        {item?.image && (
+          <Image
+            alt={item.image.altText || item.title}
+            aspectRatio="1/1"
+            data={item.image}
+            loading={index < 3 ? 'eager' : undefined}
+          />
+        )}
+      </div>
+
+      <h5>{item.title}</h5>
     </Link>
   );
 }
