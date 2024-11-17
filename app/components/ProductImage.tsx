@@ -13,7 +13,7 @@ export function ProductImage({
   width?: string;
   allMediaImages: any;
 }) {
-  const [activeImage, setActiveImage] = useState(image.url);
+  const [activeImage, setActiveImage] = useState(image.url); //TODO ! Check if the after incoming data from server component renders and showing the selected image
   const imageWidth = 100; // Adjust this based on actual image width, including margins
   const visibleImagesCount = 4; // Number of images visible at a time
 
