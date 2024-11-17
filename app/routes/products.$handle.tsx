@@ -126,6 +126,43 @@ function redirectToFirstVariant({
   );
 }
 
+const selectedVariantImg = {
+  url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/62a3dd0421fc5ccf4df6815b3694d734.jpg?v=1731592618',
+};
+
+const allMediaImages = [
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/62a3dd0421fc5ccf4df6815b3694d734.jpg?v=1731592618',
+    },
+  },
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/ef0746b3c879000196dfce266154b537.jpg?v=1731592618',
+    },
+  },
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/544c0236ac6a8def363f3db689aacf08.jpg?v=1731592618',
+    },
+  },
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/62a3dd0421fc5ccf4df6815b3694d734.jpg?v=1731592618',
+    },
+  },
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/62a3dd0421fc5ccf4df6815b3694d734.jpg?v=1731592618',
+    },
+  },
+  {
+    previewImage: {
+      url: 'https://cdn.shopify.com/s/files/1/0860/4788/3594/files/62a3dd0421fc5ccf4df6815b3694d734.jpg?v=1731592618',
+    },
+  },
+];
+
 export default function Product() {
   const {product, variants} = useLoaderData<typeof loader>();
   const selectedVariant = useOptimisticVariant(
@@ -134,11 +171,21 @@ export default function Product() {
   );
 
   const {title, descriptionHtml} = product;
-  // console.log('product >', product);
+  // console.log('product >', product?.media?.nodes);
   // console.log('selectedVariant >', selectedVariant);
+
   return (
     <div className="product container max-w-[1200px] flex ">
-      <ProductImage image={selectedVariant?.image} width={'100px'} />
+      {/*<ProductImage*/}
+      {/*  image={selectedVariant?.image}*/}
+      {/*  allMediaImages={product?.media?.nodes}*/}
+      {/*/>  */}
+
+      <ProductImage
+        image={selectedVariantImg}
+        allMediaImages={allMediaImages}
+      />
+
       <div className="product-main">
         <h2 className={'text-black text-3xl'}>{title}</h2>
         <ProductPrice
@@ -238,6 +285,12 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    media(first : 8){
+      nodes{
+        previewImage{
+          url}
+      }
+    },
     options {
       name
       optionValues {

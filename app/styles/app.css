@@ -38,7 +38,31 @@ img {
   border-radius: 5px;
 }
 
+/*
+* --------------------------------------------------
+* Scrollbar/Style
+* --------------------------------------------------
+*/
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.cursor-grab {
+  cursor: grab;
+}
+
+.cursor-grabbing {
+  cursor: grabbing;
+}
+
+.no-select {
+  user-select: none; /* Prevents text/image selection during dragging */
+}
 
 /*
 * --------------------------------------------------

@@ -25,7 +25,7 @@ export function ProductsLoadedOnScroll({
   // console.log('state >', state);
   // console.log('location >', location.pathname);
   // console.log('nextPageUrl >', nextPageUrl);
-  console.log('nodes >', nodes);
+  // console.log('nodes >', nodes);
   return (
     <div className={className as string}>
       {nodes.map((item: any) => (

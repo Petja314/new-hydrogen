@@ -1,15 +1,14 @@
-import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
+import {defer, type LoaderFunctionArgs, redirect} from '@shopify/remix-oxygen';
+import {Link, type MetaFunction, useLoaderData} from '@remix-run/react';
 import {
+  Analytics,
   getPaginationVariables,
   Image,
   Money,
-  Analytics,
   Pagination,
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import * as React from 'react';
 import {ProductsLoadedOnScroll} from '~/components/ProductsLoadedOnScroll';
 import {useInView} from 'react-intersection-observer';
@@ -150,7 +149,7 @@ function ProductItem({
   item,
   loading,
 }: {
-  product: ProductItemFragment;
+  item: ProductItemFragment;
   loading?: 'eager' | 'lazy';
 }) {
   const variant = item.variants.nodes[0];
