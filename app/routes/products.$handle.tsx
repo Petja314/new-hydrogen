@@ -173,54 +173,55 @@ export default function Product() {
   const {title, descriptionHtml} = product;
   // console.log('product >', product?.media?.nodes);
   // console.log('selectedVariant >', selectedVariant);
+  // console.log('render');
 
   return (
     <div className="product container max-w-[1200px] flex ">
-      {/*<ProductImage*/}
-      {/*  image={selectedVariant?.image}*/}
-      {/*  allMediaImages={product?.media?.nodes}*/}
-      {/*/>  */}
-
       <ProductImage
-        image={selectedVariantImg}
-        allMediaImages={allMediaImages}
+        image={selectedVariant?.image}
+        allMediaImages={product?.media?.nodes}
       />
 
-      <div className="product-main">
-        <h2 className={'text-black text-3xl'}>{title}</h2>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
+      {/*<ProductImage*/}
+      {/*  image={selectedVariantImg}*/}
+      {/*  allMediaImages={allMediaImages}*/}
+      {/*/>*/}
 
-        <Suspense
-          fallback={
-            <ProductForm
-              product={product}
-              selectedVariant={selectedVariant}
-              variants={[]}
-            />
-          }
-        >
-          <Await
-            errorElement="There was a problem loading product variants"
-            resolve={variants}
-          >
-            {(data) => (
-              <ProductForm
-                product={product}
-                selectedVariant={selectedVariant}
-                variants={data?.product?.variants.nodes || []}
-              />
-            )}
-          </Await>
-        </Suspense>
+      {/*<div className="product-main">*/}
+      {/*  <h2 className={'text-black text-3xl'}>{title}</h2>*/}
+      {/*  <ProductPrice*/}
+      {/*    price={selectedVariant?.price}*/}
+      {/*    compareAtPrice={selectedVariant?.compareAtPrice}*/}
+      {/*  />*/}
 
-        <p>
-          <strong>Description</strong>
-        </p>
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-      </div>
+      {/*  <Suspense*/}
+      {/*    fallback={*/}
+      {/*      <ProductForm*/}
+      {/*        product={product}*/}
+      {/*        selectedVariant={selectedVariant}*/}
+      {/*        variants={[]}*/}
+      {/*      />*/}
+      {/*    }*/}
+      {/*  >*/}
+      {/*    <Await*/}
+      {/*      errorElement="There was a problem loading product variants"*/}
+      {/*      resolve={variants}*/}
+      {/*    >*/}
+      {/*      {(data) => (*/}
+      {/*        <ProductForm*/}
+      {/*          product={product}*/}
+      {/*          selectedVariant={selectedVariant}*/}
+      {/*          variants={data?.product?.variants.nodes || []}*/}
+      {/*        />*/}
+      {/*      )}*/}
+      {/*    </Await>*/}
+      {/*  </Suspense>*/}
+
+      {/*  <p>*/}
+      {/*    <strong>Description</strong>*/}
+      {/*  </p>*/}
+      {/*  <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />*/}
+      {/*</div>*/}
       <Analytics.ProductView
         data={{
           products: [

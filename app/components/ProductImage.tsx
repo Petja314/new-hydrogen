@@ -1,5 +1,5 @@
 import type {ProductVariantFragment} from 'storefrontapi.generated';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useDragScroll} from '~/lib/hooks/useDragScroll';
 
 const img = [];
@@ -16,6 +16,10 @@ export function ProductImage({
   const [activeImage, setActiveImage] = useState(image.url); //TODO ! Check if the after incoming data from server component renders and showing the selected image
   const imageWidth = 100; // Adjust this based on actual image width, including margins
   const visibleImagesCount = 4; // Number of images visible at a time
+
+  useEffect(() => {
+    setActiveImage(image.url);
+  }, [image.url]);
 
   const {containerRef, scrollToRevealNext} = useDragScroll(
     imageWidth,
@@ -35,19 +39,22 @@ export function ProductImage({
     setActiveImage(img);
   };
 
+  // console.log('image.url >', image.url);
+  // console.log('activeImage >', activeImage);
+  // console.log('render');
   return (
-    <div className="flex flex-col justify-between lg:flex-row">
+    <div className="flex flex-col justify-between  max-w-[350px] sm:flex-row md:flex-row lg:flex-row border border-black ">
       <div className="flex flex-col gap-6">
         {/* Selected image */}
         <img
           src={activeImage}
           alt="img-preview"
-          className="w-full h-full aspect-square object-cover rounded-xl"
+          className=" h-full aspect-square object-cover rounded-xl "
         />
         {/* Scrollable container */}
         <div
           ref={containerRef}
-          className="flex flex-row justify-between h-24 overflow-x-auto gap-2 max-w-full hide-scrollbar cursor-grab"
+          className="flex flex-row justify-between h-24 overflow-x-auto gap-2 max-w-full hide-scrollbar cursor-grab "
         >
           {allMediaImages.map((image: any, index: number) => (
             <img

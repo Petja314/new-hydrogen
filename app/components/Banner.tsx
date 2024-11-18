@@ -1,6 +1,5 @@
 import React from 'react';
 import banner from '~/assets/banner/BANNER.webp';
-import {Button} from '@headlessui/react';
 import {Link} from '@remix-run/react';
 interface Props {
   className?: string;
@@ -24,7 +23,7 @@ const Banner: React.FC<Props> = ({className}) => {
           </div>
           <div>
             <Link to={'/collections'}>
-              <Button className="button-wh mt-5">Shop now</Button>
+              <button className="button-wh mt-5">Shop now</button>
             </Link>
           </div>
         </div>

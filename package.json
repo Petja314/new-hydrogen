@@ -17,7 +17,7 @@
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@headlessui/react": "2.2.0",
+    "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.1.5",
     "@remix-run/react": "2.13.1",
     "@remix-run/server-runtime": "2.13.1",
