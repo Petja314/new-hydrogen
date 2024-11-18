@@ -6,12 +6,15 @@ import {
   getSelectedProductOptions,
   Analytics,
   useOptimisticVariant,
+  getPaginationVariables,
 } from '@shopify/hydrogen';
 import type {SelectedOption} from '@shopify/hydrogen/storefront-api-types';
 import {getVariantUrl} from '~/lib/variants';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
+import {COLLECTION_QUERY} from '~/routes/collections.$handle';
+import RelatedProducts from '~/components/RelatedProducts';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.product.title ?? ''}`}];
@@ -49,6 +52,20 @@ async function loadCriticalData({
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
+  const handleCollection = product?.collections.edges[0].node.handle;
+  // console.log('collections handle >', handleCollection);
+  const [{collection}] = await Promise.all([
+    storefront.query(COLLECTION_QUERY, {
+      variables: {handleCollection, first: 8},
+      // Add other queries here, so that they are loaded in parallel
+    }),
+  ]);
+
+  if (!collection) {
+    throw new Response(`Collection ${handleCollection} not found`, {
+      status: 404,
+    });
+  }
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -71,9 +88,9 @@ async function loadCriticalData({
       throw redirectToFirstVariant({product, request});
     }
   }
-
   return {
     product,
+    collection,
   };
 }
 
@@ -88,6 +105,7 @@ function loadDeferredData({context, params}: LoaderFunctionArgs) {
   // into it's own separate query that is deferred. So there's a brief moment
   // where variant options might show as available when they're not, but after
   // this deffered query resolves, the UI will update.
+
   const variants = context.storefront
     .query(VARIANTS_QUERY, {
       variables: {handle: params.handle!},
@@ -164,7 +182,9 @@ const allMediaImages = [
 ];
 
 export default function Product() {
-  const {product, variants} = useLoaderData<typeof loader>();
+  const {product, variants, collection} = useLoaderData<typeof loader>();
+  // console.log('product > ', product);
+  // console.log('collection > ', collection);
   const selectedVariant = useOptimisticVariant(
     product.selectedVariant,
     variants,
@@ -176,52 +196,57 @@ export default function Product() {
   // console.log('render');
 
   return (
-    <div className="product container max-w-[1200px] flex ">
-      {/*<ProductImage*/}
-      {/*  image={selectedVariant?.image}*/}
-      {/*  allMediaImages={product?.media?.nodes}*/}
-      {/*/>*/}
+    <div className=" container max-w-[1200px]  ">
+      <div className="product container max-w-[1200px] flex mb-8 ">
+        <ProductImage
+          image={selectedVariant?.image}
+          allMediaImages={product?.media?.nodes}
+        />
 
-      <ProductImage
-        image={selectedVariantImg}
-        allMediaImages={allMediaImages}
-      />
+        {/*<ProductImage*/}
+        {/*  image={selectedVariantImg}*/}
+        {/*  allMediaImages={allMediaImages}*/}
+        {/*/>*/}
 
-      {/*<div className="product-main">*/}
-      {/*  <h2 className={'text-black text-3xl'}>{title}</h2>*/}
-      {/*  <ProductPrice*/}
-      {/*    price={selectedVariant?.price}*/}
-      {/*    compareAtPrice={selectedVariant?.compareAtPrice}*/}
-      {/*  />*/}
+        <div className="product-main">
+          <h2 className={'text-black text-3xl'}>{title}</h2>
+          <ProductPrice
+            price={selectedVariant?.price}
+            compareAtPrice={selectedVariant?.compareAtPrice}
+          />
 
-      {/*  <Suspense*/}
-      {/*    fallback={*/}
-      {/*      <ProductForm*/}
-      {/*        product={product}*/}
-      {/*        selectedVariant={selectedVariant}*/}
-      {/*        variants={[]}*/}
-      {/*      />*/}
-      {/*    }*/}
-      {/*  >*/}
-      {/*    <Await*/}
-      {/*      errorElement="There was a problem loading product variants"*/}
-      {/*      resolve={variants}*/}
-      {/*    >*/}
-      {/*      {(data) => (*/}
-      {/*        <ProductForm*/}
-      {/*          product={product}*/}
-      {/*          selectedVariant={selectedVariant}*/}
-      {/*          variants={data?.product?.variants.nodes || []}*/}
-      {/*        />*/}
-      {/*      )}*/}
-      {/*    </Await>*/}
-      {/*  </Suspense>*/}
+          <Suspense
+            fallback={
+              <ProductForm
+                product={product}
+                selectedVariant={selectedVariant}
+                variants={[]}
+              />
+            }
+          >
+            <Await
+              errorElement="There was a problem loading product variants"
+              resolve={variants}
+            >
+              {(data) => (
+                <ProductForm
+                  product={product}
+                  selectedVariant={selectedVariant}
+                  variants={data?.product?.variants.nodes || []}
+                />
+              )}
+            </Await>
+          </Suspense>
 
-      {/*  <p>*/}
-      {/*    <strong>Description</strong>*/}
-      {/*  </p>*/}
-      {/*  <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />*/}
-      {/*</div>*/}
+          <p>
+            <strong>Description</strong>
+          </p>
+          <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+        </div>
+      </div>
+
+      <RelatedProducts collection={collection?.products?.nodes} />
+
       <Analytics.ProductView
         data={{
           products: [
@@ -279,38 +304,56 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
 ` as const;
 
 const PRODUCT_FRAGMENT = `#graphql
-  fragment Product on Product {
-    id
-    title
-    vendor
-    handle
-    descriptionHtml
-    description
-    media(first : 8){
-      nodes{
-        previewImage{
-          url}
+fragment Product on Product {
+  id
+  title
+  vendor
+  handle
+  descriptionHtml
+  description
+  collections(first : 1){
+    edges{
+      node{
+        handle
+        id
+        title
+        image{
+          url
+          altText
+        }
       }
-    },
-    options {
-      name
-      optionValues {
-        name
-      }
-    }
-    selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
-      ...ProductVariant
-    }
-    variants(first: 1) {
-      nodes {
-        ...ProductVariant
-      }
-    }
-    seo {
-      description
-      title
     }
   }
+  media(first: 8) {
+    nodes {
+      previewImage {
+        url
+      }
+    }
+  }
+  options {
+    name
+    optionValues {
+      name
+    }
+  }
+  selectedVariant: variantBySelectedOptions(
+    selectedOptions: $selectedOptions
+    ignoreUnknownOptions: true
+    caseInsensitiveMatch: true
+  ) {
+    ...ProductVariant
+  }
+  variants(first: 1) {
+    nodes {
+      ...ProductVariant
+    }
+  }
+  seo {
+    description
+    title
+  }
+}
   ${PRODUCT_VARIANT_FRAGMENT}
 ` as const;
 

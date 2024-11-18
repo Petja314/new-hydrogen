@@ -68,7 +68,7 @@ export function ProductImage({
               src={image.previewImage.url}
               alt="Preview"
               draggable="false"
-              className={`md:w-24 md:h-24 rounded-md h-[300px] max-w-[250px] cursor-pointer object-cover flex-shrink-0 border border-gray-500 `}
+              className={`md:w-24 md:h-24 rounded-md h-[300px] max-w-[250px] cursor-pointer object-cover flex-shrink-0  `}
             />
           ))}
         </div>

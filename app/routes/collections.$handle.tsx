@@ -36,25 +36,29 @@ async function loadCriticalData({
   params,
   request,
 }: LoaderFunctionArgs) {
+  // console.log('params', params);
+  // console.log('request', request);
   const {handle} = params;
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
-
+  // console.log('handleCollection collection >', handle);
   if (!handle) {
     throw redirect('/collections');
   }
+  //RENAMING THE VARIABLE TO MAKE API REQUEST IN DIFFERENT ROUTES example : products.$handle.tsx! handleCollection -
+  const handleCollection = handle;
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
+      variables: {handleCollection, ...paginationVariables},
       // Add other queries here, so that they are loaded in parallel
     }),
   ]);
 
   if (!collection) {
-    throw new Response(`Collection ${handle} not found`, {
+    throw new Response(`Collection ${handleCollection} not found`, {
       status: 404,
     });
   }
@@ -77,6 +81,7 @@ export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
   const {ref, inView, entry} = useInView();
 
+  // console.log('collection >', collection);
   return (
     <div className={'recommended-pr-bg-cl pt-10 pb-10 '}>
       <div className="collection container max-w-[1200px]">
@@ -154,6 +159,8 @@ function ProductItem({
 }) {
   const variant = item.variants.nodes[0];
   const variantUrl = useVariantUrl(item.handle, variant.selectedOptions);
+  // console.log('variant >', variant);
+  // console.log('variantUrl >', variantUrl);
   return (
     <Link
       className="product-item"
@@ -214,10 +221,10 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
 ` as const;
 
 // NOTE: https://shopify.dev/docs/api/storefront/2022-04/objects/collection
-const COLLECTION_QUERY = `#graphql
+export const COLLECTION_QUERY = `#graphql
   ${PRODUCT_ITEM_FRAGMENT}
   query Collection(
-    $handle: String!
+    $handleCollection: String!
     $country: CountryCode
     $language: LanguageCode
     $first: Int
@@ -225,7 +232,7 @@ const COLLECTION_QUERY = `#graphql
     $startCursor: String
     $endCursor: String
   ) @inContext(country: $country, language: $language) {
-    collection(handle: $handle) {
+    collection(handle: $handleCollection) {
       id
       handle
       title
