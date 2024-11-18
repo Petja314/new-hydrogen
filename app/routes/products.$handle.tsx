@@ -177,15 +177,15 @@ export default function Product() {
 
   return (
     <div className="product container max-w-[1200px] flex ">
-      <ProductImage
-        image={selectedVariant?.image}
-        allMediaImages={product?.media?.nodes}
-      />
-
       {/*<ProductImage*/}
-      {/*  image={selectedVariantImg}*/}
-      {/*  allMediaImages={allMediaImages}*/}
+      {/*  image={selectedVariant?.image}*/}
+      {/*  allMediaImages={product?.media?.nodes}*/}
       {/*/>*/}
+
+      <ProductImage
+        image={selectedVariantImg}
+        allMediaImages={allMediaImages}
+      />
 
       {/*<div className="product-main">*/}
       {/*  <h2 className={'text-black text-3xl'}>{title}</h2>*/}

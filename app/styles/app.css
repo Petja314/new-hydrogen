@@ -44,8 +44,13 @@ img {
 * --------------------------------------------------
 */
 .hide-scrollbar {
+  /*scrollbar-width: none;*/
+  /*-ms-overflow-style: none;*/
+@media (min-width: 768px) {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  user-select: none;
+}
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -53,11 +58,17 @@ img {
 }
 
 .cursor-grab {
+  /*cursor: grab;*/
+@media (min-width: 768px) {
   cursor: grab;
+}
 }
 
 .cursor-grabbing {
   cursor: grabbing;
+@media (min-width: 768px) {
+  cursor: grabbing;
+}
 }
 
 .no-select {

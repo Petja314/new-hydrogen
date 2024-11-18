@@ -39,35 +39,91 @@ export function ProductImage({
     setActiveImage(img);
   };
 
+  const getImageStyle = (index: any) => ({
+    marginRight: index === 1 ? '-50px' : '0px',
+  });
+
   // console.log('image.url >', image.url);
   // console.log('activeImage >', activeImage);
   // console.log('render');
   return (
-    <div className="flex flex-col justify-between  max-w-[350px] sm:flex-row md:flex-row lg:flex-row border border-black ">
-      <div className="flex flex-col gap-6">
-        {/* Selected image */}
-        <img
-          src={activeImage}
-          alt="img-preview"
-          className=" h-full aspect-square object-cover rounded-xl "
-        />
-        {/* Scrollable container */}
+    <div>
+      <div className="flex md:flex-col md:justify-between md:max-w-[350px] max-w-[300px] overflow-x-auto gap-4 hide-scrollbar relative  ">
+        <div className="md:flex md:flex-col md:gap-6 md:items-center">
+          <img
+            src={activeImage}
+            alt="img-preview"
+            className="md:h-full md:max-w-[350px] md:aspect-square  rounded-md h-[300px] max-w-[250px] object-cover flex-shrink-0 mr-[5px]"
+          />
+        </div>
+
         <div
           ref={containerRef}
-          className="flex flex-row justify-between h-24 overflow-x-auto gap-2 max-w-full hide-scrollbar cursor-grab "
+          className="md:flex md:flex-row md:justify-between md:h-24 md:overflow-x-auto md:gap-2 md:max-w-full hide-scrollbar cursor-grab inline-flex gap-4"
         >
           {allMediaImages.map((image: any, index: number) => (
             <img
               onClick={() => handleImageClick(image.previewImage.url, index)}
               key={index}
               src={image.previewImage.url}
-              alt="img"
+              alt="Preview"
               draggable="false"
-              className="w-24 h-24 rounded-md cursor-pointer flex-shrink-0"
+              className={`md:w-24 md:h-24 rounded-md h-[300px] max-w-[250px] cursor-pointer object-cover flex-shrink-0 border border-gray-500 `}
             />
           ))}
         </div>
       </div>
+
+      {/*MOBILE VIEW*/}
+      {/*<div className="flex overflow-x-auto gap-4 hide-scrollbar relative max-w-full md:hidden ">*/}
+      {/*  /!* Главное изображение *!/*/}
+      {/*  <img*/}
+      {/*    src={activeImage}*/}
+      {/*    alt="img-preview"*/}
+      {/*    className="border border-gray-500 rounded-md h-[300px] w-[250px] object-cover flex-shrink-0 mr-[-30px]"*/}
+      {/*  />*/}
+
+      {/*  /!* Прочие изображения *!/*/}
+      {/*  {allMediaImages.map((image: any, index: any) => (*/}
+      {/*    <img*/}
+      {/*      key={index}*/}
+      {/*      src={image.previewImage.url}*/}
+      {/*      alt="Preview"*/}
+      {/*      className={`border border-gray-500 rounded-md h-[300px] w-[250px] object-cover flex-shrink-0 ${*/}
+      {/*        index === 0 ? 'ml-[30px]' : ''*/}
+      {/*      }`}*/}
+      {/*      draggable="false"*/}
+      {/*    />*/}
+      {/*  ))}*/}
+      {/*</div>*/}
+
+      {/*DESKTOP VIEW*/}
+      {/*<div className="flex flex-col justify-between  max-w-[350px] sm:flex-row md:flex-row lg:flex-row  hidden md:block">*/}
+      {/*  <div className="flex flex-col gap-6">*/}
+      {/*    /!* Selected image *!/*/}
+      {/*    <img*/}
+      {/*      src={activeImage}*/}
+      {/*      alt="img-preview"*/}
+      {/*      className=" h-full aspect-square object-cover rounded-xl "*/}
+      {/*    />*/}
+      {/*    /!* Scrollable container *!/*/}
+      {/*    <div*/}
+      {/*      ref={containerRef}*/}
+      {/*      className="flex flex-row justify-between h-24 overflow-x-auto gap-2 max-w-full hide-scrollbar cursor-grab "*/}
+      {/*    >*/}
+      {/*      {allMediaImages.map((image: any, index: number) => (*/}
+      {/*        <img*/}
+      {/*          onClick={() => handleImageClick(image.previewImage.url, index)}*/}
+      {/*          key={index}*/}
+      {/*          src={image.previewImage.url}*/}
+      {/*          alt="img"*/}
+      {/*          draggable="false"*/}
+      {/*          className="w-24 h-24 cursor-pointer flex-shrink-0 border border-gray-500 rounded-md "*/}
+      {/*        />*/}
+      {/*      ))}*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
     </div>
   );
 }
